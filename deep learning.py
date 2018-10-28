@@ -20,7 +20,6 @@ output=Dense(1,activation='sigmoid')(hidden3)
 
 
 #Compile network
-
 model=Model(input=visible,output=output)
 #Fit Network
 #Evaluate Network
