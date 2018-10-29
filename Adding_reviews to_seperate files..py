@@ -36,42 +36,45 @@ def clearning_doc(doc_text):
     #filter out the short tokens
     tokens=[word for word in tokens if len(word)>2]
     return tokens
-#Adding the vocab by laoding the doc
-def add_vocab_load_data(filename,vocab):
-  data=loading_data(filename)
-  vocab_words=clearning_doc(data)
-  vocab.update(vocab_words)
+
+# save list to file
+def save_list(lines,filename):
+    data='\n'.join(lines)
+    with open (filename, 'w') as f:
+        f.write(data)
+#load the doc, clean the doc and save the doc
+def doc_to_line(filename,vocab):
+    #load
+   doc=loading_data(filename)
+   tokens=clearning_doc(doc)
+   tokens=[word for word in tokens if word in vocab]
+   return ' '.join(tokens)
+
 
 #Adding all docs in directory
 def going_process(directory,vocab):
+    lines=list()
     for filename in listdir(directory):
         if not filename.endswith('.txt'):
             next
         path=directory+'/'+filename
-        add_vocab_load_data(path,vocab)
+        line=doc_to_line(path,vocab)
+        lines.append(line)
+    return lines
 #save the vocab list to the file
 def save_list(lines,filename):
     data='\n'.join(lines)
     with open(filename,'w') as f:
         f.write(data)
 
-#define vocab
-vocab=Counter()
-#add all docs to vocab
-going_process('txt_sentoken/neg',vocab)
-going_process('txt_sentoken/pos',vocab)
+#loading vocab
+vocab_name='vocab.txt'
+vocab=loading_data(vocab_name)
+vocab=vocab.split()
+vocab=set(vocab)
 
-#print the size of the vocab
-print(len(vocab))
-#print the top words in the vocab
-print(vocab.most_common(50))
-#keep tokens with >5 occurrence
-min_occurrence=5
-tokens=[k for k,c in vocab.items() if c>=min_occurrence]
-print(len(tokens))
-#save tokens to a vocabulary file
-save_list(tokens,'vocab.txt')
-
-
-
-
+#prepaing the postive file
+postive_lines=going_process('txt_sentoken/pos',vocab)
+save_list(postive_lines,'postive.txt')
+negative_lines=going_process('txt_sentoken/neg',vocab)
+save_list(negative_lines,'negative.txt')
